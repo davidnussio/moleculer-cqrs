@@ -1,0 +1,12 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Testing aggregate commands in isolation should createTest command return an TestCreatedEvent 1`] = `
+Object {
+  "payload": Object {
+    "text": "Asperiores nam tempora qui et provident temporibus illo et fugit.",
+    "title": "Title test",
+    "userId": "user-id-1",
+  },
+  "type": "aggregate.test.created",
+}
+`;

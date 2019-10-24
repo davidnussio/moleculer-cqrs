@@ -1,0 +1,97 @@
+{
+  "name": "moleculer-cqrs",
+  "version": "0.1.0-beta.1",
+  "description": "My Moleculer microservices project",
+  "author": {
+    "name": "David Nussio",
+    "email": "david.nussio@gmail.com"
+  },
+  "scripts": {
+    "ci": "jest --watch",
+    "test": "jest --coverage --no-cache",
+    "deps": "npm-check -u",
+    "lint": "eslint --ext=.js src test",
+    "lint:fix": "eslint --fix --ext=.js src test",
+    "format": "prettier src/**/*.js test/**/*.js",
+    "coverall": "cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js"
+  },
+  "keywords": [
+    "microservices",
+    "moleculer",
+    "cqrs",
+    "event sourcing",
+    "ddd"
+  ],
+  "license": "MIT",
+  "peerDependencies": {
+    "moleculer": "^0.13.11 || ~0.14",
+    "moleculer-db": "^0.8.2"
+  },
+  "devDependencies": {
+    "@types/jest": "^24.0.18",
+    "coveralls": "^3.0.7",
+    "eslint": "^6.1.0",
+    "eslint-config-airbnb": "^18.0.1",
+    "eslint-config-prettier": "^6.3.0",
+    "eslint-plugin-import": "^2.18.2",
+    "eslint-plugin-prettier": "^3.1.1",
+    "husky": "^3.0.8",
+    "jest": "^24.8.0",
+    "jest-cli": "^24.8.0",
+    "lint-staged": "^9.4.1",
+    "moleculer": "^0.13.11",
+    "moleculer-db": "^0.8.2",
+    "npm-check": "^5.9.0",
+    "post-merge-install": "^0.3.0",
+    "prettier": "^1.18.2"
+  },
+  "dependencies": {
+    "consolidate": "^0.15.1",
+    "fastest-validator": "^0.6.18",
+    "glob": "^7.1.4",
+    "inquirer": "^7.0.0",
+    "resolve-command": "^0.20.28",
+    "resolve-es": "^0.20.28",
+    "resolve-storage-lite": "^0.20.28",
+    "uuid": "^3.3.3",
+    "vorpal": "^1.12.0"
+  },
+  "engines": {
+    "node": ">= 8.x.x"
+  },
+  "jest": {
+    "coverageDirectory": "../coverage",
+    "testEnvironment": "node",
+    "rootDir": "./src",
+    "roots": [
+      "../test"
+    ],
+    "coveragePathIgnorePatterns": [
+      "/node_modules/",
+      "/test/aggregate/"
+    ]
+  },
+  "prettier": {
+    "trailingComma": "es5",
+    "tabWidth": 2,
+    "semi": true
+  },
+  "lint-staged": {
+    "*.{json,css,md}": [
+      "prettier --write",
+      "git add"
+    ],
+    "*.js": [
+      "eslint --fix",
+      "prettier --write",
+      "git add"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged",
+      "post-merge": "post-merge-install",
+      "post-rebase": "post-merge-install"
+    }
+  }
+}
