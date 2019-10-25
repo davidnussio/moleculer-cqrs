@@ -49,12 +49,10 @@
     "consolidate": "^0.15.1",
     "fastest-validator": "^0.6.18",
     "glob": "^7.1.4",
-    "inquirer": "^7.0.0",
     "resolve-command": "^0.20.28",
     "resolve-es": "^0.20.28",
     "resolve-storage-lite": "^0.20.28",
-    "uuid": "^3.3.3",
-    "vorpal": "^1.12.0"
+    "uuid": "^3.3.3"
   },
   "engines": {
     "node": ">= 8.x.x"
