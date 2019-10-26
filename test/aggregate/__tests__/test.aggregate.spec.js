@@ -3,7 +3,7 @@ const CQRSFixture = require("../../../src/cqrs-fixture");
 const aggregate = require("..");
 
 const {
-  commands: { createTest, deleteTest },
+  commands: { createTest, deleteTest, genericCommandTest },
   events: { TestCreatedEvent, TestDeletedEvent },
 } = aggregate;
 
@@ -50,20 +50,29 @@ describe("Testing news aggregate with cqrs fixture", () => {
         type: "createTest",
         payload,
       })
-      .expectEvents(TestCreatedEvent(payload));
+      .expectEvents(TestCreatedEvent({ ...payload, createdAt: Date.now() }));
   });
 
   test("should command function", () => {
     fixture
       .givenEvents()
       .when(createTest, payload)
-      .expectEvents(TestCreatedEvent(payload));
+      .expectEvents(TestCreatedEvent({ ...payload, createdAt: Date.now() }));
   });
 
-  test("should reject upvode command when news already deleted", () => {
+  test("should reject all next commands when aggregate is already deleted", () => {
+    const initialEventStream = [
+      TestCreatedEvent({ payload, createdAt: Date.now() }),
+      TestDeletedEvent({ deletedAt: Date.now() }),
+    ];
     fixture
-      .givenEvents([TestCreatedEvent(payload), TestDeletedEvent()])
+      .givenEvents(initialEventStream)
       .whenThrow(deleteTest, {})
+      .toThrow("Aggregate is already deleted");
+
+    fixture
+      .givenEvents(initialEventStream)
+      .whenThrow(genericCommandTest, {})
       .toThrow("Aggregate is already deleted");
   });
 });

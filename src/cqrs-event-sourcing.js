@@ -21,7 +21,7 @@ const aggregateSchema = {
   // deserializeState: function
 };
 
-module.exports = function CQRSEventSource({
+module.exports = function CQRSEventSourcing({
   aggregate = false,
   replay = false,
 }) {
@@ -32,7 +32,7 @@ module.exports = function CQRSEventSource({
     // eslint-disable-next-line no-cond-assign
     if ((vRes = v.validate(aggregate, aggregateSchema)) !== true) {
       throw new Error(
-        `CQRSEventSource${vRes.map(err => err.message).join("\n")}`
+        `CQRSEventSourcing${vRes.map(err => err.message).join("\n")}`
       );
     }
   }

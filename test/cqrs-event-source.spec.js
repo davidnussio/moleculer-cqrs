@@ -1,10 +1,24 @@
 /* eslint-disable no-restricted-syntax */
+const addMilliseconds = require("date-fns/addMilliseconds");
+
 const {
   ServiceBroker,
   Errors: { ValidationError, MoleculerClientError, MoleculerServerError },
 } = require("moleculer");
-const CQRSEventSource = require("../src/cqrs-event-sourcing");
+const CQRSEventSourcing = require("../src/cqrs-event-sourcing");
 const aggregate = require("./aggregate");
+
+function* genNextDate() {
+  for (let h = 0; true; h++) {
+    yield addMilliseconds(new Date("2019-01-20T10:15:45.125Z"), h).valueOf();
+  }
+}
+
+const mockDate = genNextDate();
+
+const sequenceDateNow = () => mockDate.next().value;
+
+jest.spyOn(global.Date, "now").mockImplementation(sequenceDateNow);
 
 async function delay(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -37,13 +51,13 @@ const storage = EventSourceStorage();
 
 const TestAggregateService = {
   name: "test",
-  mixins: [CQRSEventSource({ aggregate })],
+  mixins: [CQRSEventSourcing({ aggregate })],
   storage,
 };
 
 const TestInternalsService = {
   name: "internals",
-  mixins: [CQRSEventSource({})],
+  mixins: [CQRSEventSourcing({})],
   storage,
 };
 
@@ -188,7 +202,7 @@ describe("CQRS event source", () => {
 
   test("should invalid aggregate configuration throw and error", async () => {
     expect(() =>
-      CQRSEventSource({
+      CQRSEventSourcing({
         aggregate: {
           name: "abc",
           commands: {},
@@ -204,7 +218,7 @@ describe("CQRS event source", () => {
     broker.createService({
       name: "local-service",
       aggregateName: "local-name",
-      mixins: [CQRSEventSource({ aggregate })],
+      mixins: [CQRSEventSourcing({ aggregate })],
     });
     const localService = broker.getLocalService("local-service");
     expect(localService.aggregateName).toEqual("local-name");
@@ -214,7 +228,7 @@ describe("CQRS event source", () => {
     const broker = new ServiceBroker({ logger: false });
     broker.createService({
       name: "local-service",
-      mixins: [CQRSEventSource({ aggregate })],
+      mixins: [CQRSEventSourcing({ aggregate })],
     });
     const localService = broker.getLocalService("local-service");
     expect(localService.storage).toBeDefined();
@@ -375,7 +389,7 @@ describe("CQRS event source", () => {
         aggregateId,
         finishTime: history[0].timestamp,
       });
-      expect(result).toEqual({});
+      expect(result.createdAt).toBeDefined();
 
       for (let i = 0; i < history.length - 2; i++) {
         // eslint-disable-next-line no-await-in-loop
@@ -383,14 +397,17 @@ describe("CQRS event source", () => {
           aggregateId,
           finishTime: history[i + 1].timestamp,
         });
-        expect(result).toEqual({ i });
+        expect(result.createdAt).toBeDefined();
+        expect(result.i).toEqual(i);
       }
 
       result = await broker1.call("test.read-model", {
         aggregateId,
         finishTime: history[history.length - 1].timestamp,
       });
-      expect(result).toEqual({ i: history.length - 3, deleted: true });
+      expect(result.createdAt).toBeDefined();
+      expect(result.deletedAt).toBeDefined();
+      expect(result.i).toEqual(history.length - 3);
     });
   });
 

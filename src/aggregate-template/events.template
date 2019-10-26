@@ -1,0 +1,35 @@
+const CREATED = "aggregate.{{aggregateName}}.created";
+const DELETED = "aggregate.{{aggregateName}}.deleted";
+const GENERIC = "aggregate.{{aggregateName}}.generic";
+
+function {{camelCaseName}}CreatedEvent(payload) {
+  return {
+    type: CREATED,
+    payload
+  };
+}
+
+function {{camelCaseName}}DeletedEvent(payload) {
+  return {
+    type: DELETED,
+    payload
+  };
+}
+
+function {{camelCaseName}}GenericEvent(payload) {
+  return {
+    type: GENERIC,
+    payload,
+  };
+}
+
+module.exports = {
+  types: {
+    CREATED,
+    DELETED,
+    GENERIC,
+  },
+  {{camelCaseName}}CreatedEvent,
+  {{camelCaseName}}DeletedEvent,
+  {{camelCaseName}}GenericEvent,
+};

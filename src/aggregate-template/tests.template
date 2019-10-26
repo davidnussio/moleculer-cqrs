@@ -1,0 +1,78 @@
+const { CQRSFixture } = require("moleculer-cqrs");
+
+const aggregate = require("..");
+
+const {
+  commands: { create{{camelCaseName}}, delete{{camelCaseName}}, genericCommand{{camelCaseName}} },
+  events: { {{camelCaseName}}CreatedEvent, {{camelCaseName}}DeletedEvent },
+} = aggregate;
+
+jest
+  .spyOn(global.Date, "now")
+  .mockImplementation(() => new Date("2019-10-01T11:01:58.135Z").valueOf());
+
+const payload = {
+  title: "Test document title",
+  userId: "user-id-1",
+  text: "Asperiores nam tempora qui et provident temporibus illo et fugit.",
+};
+
+describe("Testing aggregate commands in isolation", () => {
+  test("should commands with empty payload throw error", () => {
+    expect(() => create{{camelCaseName}}({}, {})).toThrow("Aggregate validation error");
+  });
+
+  test("should create{{camelCaseName}} command return an {{camelCaseName}}CreatedEvent", () => {
+    expect(
+      create{{camelCaseName}}(
+        {},
+        {
+          payload
+        }
+      )
+    ).toMatchSnapshot();
+  });
+});
+
+describe("Testing {{aggregateId}} aggregate with cqrs fixture", () => {
+  let fixture;
+
+  beforeEach(() => {
+    fixture = new CQRSFixture(aggregate);
+  });
+
+  test("should call raw command", () => {
+    fixture
+      .givenEvents([])
+      .when({
+        aggregateId: "aggregate-uuid-1",
+        aggregateName: "{{aggregateName}}",
+        type: "create{{camelCaseName}}",
+        payload
+      })
+      .expectEvents({{camelCaseName}}CreatedEvent({...payload, createdAt: Date.now() }));
+  });
+
+  test("should create{{camelCaseName}} return an {{camelCaseName}}CreatedEvent event", () => {
+    fixture
+      .givenEvents()
+      .when(create{{camelCaseName}}, payload)
+      .expectEvents({{camelCaseName}}CreatedEvent({ ...payload, createdAt: Date.now() }));
+  });
+
+  test("should reject all next commands when aggregate is already deleted", () => {
+    const initialEventStream = [
+      {{camelCaseName}}CreatedEvent({ payload, createdAt: Date.now() }),
+      {{camelCaseName}}DeletedEvent({ deletedAt: Date.now() }),
+    ];
+    fixture
+      .givenEvents(initialEventStream)
+      .whenThrow(delete{{camelCaseName}}, {})
+      .toThrow("Aggregate is already deleted");
+
+    fixture
+      .givenEvents(initialEventStream)
+      .whenThrow(genericCommand{{camelCaseName}}, {})
+      .toThrow("Aggregate is already deleted");
+  });
+});

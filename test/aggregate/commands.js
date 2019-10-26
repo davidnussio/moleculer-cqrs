@@ -1,61 +1,25 @@
-const Validator = require("fastest-validator");
-
+const { schemas, validate } = require("./validate");
 const {
   TestCreatedEvent,
   TestDeletedEvent,
   TestGenericEvent,
 } = require("./events");
 
-class ValidationError extends Error {
-  constructor(message, cause) {
-    super(message);
-    this.name = "ValidationError";
-    this.cause = cause;
-  }
-}
-
-const v = new Validator();
-
-function validate(object, schema) {
-  const result = v.validate(object, schema);
-
-  if (result === true) {
-    return true;
-  }
-
-  const messages = result.map(({ message }) => message).join("\n 🔥 ");
-
-  throw new ValidationError(
-    `Aggregate validation error 😭\n🔥  ${messages}`,
-    result
-  );
-}
-
 function createTest(state, command) {
-  validate(state, { deleted: { type: "forbidden" } });
-  validate(command, { payload: { type: "object" } });
+  validate(state, schemas.createTest.state);
+  validate(command, schemas.createTest.command);
 
-  return TestCreatedEvent(command.payload);
+  return TestCreatedEvent({ ...command.payload, createdAt: Date.now() });
 }
 
 function deleteTest(state, command) {
-  validate(state, {
-    deleted: {
-      type: "forbidden",
-      messages: { forbidden: "Aggregate is already deleted" },
-    },
-  });
+  validate(state, schemas.deleteTest.state);
 
-  return TestDeletedEvent(command.payload);
+  return TestDeletedEvent({ ...command.payload, deletedAt: Date.now() });
 }
 
 function genericCommandTest(state, command) {
-  validate(state, {
-    deleted: {
-      type: "forbidden",
-      messages: { forbidden: "Aggregate is already deleted" },
-    },
-  });
+  validate(state, schemas.genericCommand.state);
 
   return TestGenericEvent(command.payload);
 }

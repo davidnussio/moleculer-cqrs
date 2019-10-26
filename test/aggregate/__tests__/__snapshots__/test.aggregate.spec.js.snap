@@ -3,6 +3,7 @@
 exports[`Testing aggregate commands in isolation should createTest command return an TestCreatedEvent 1`] = `
 Object {
   "payload": Object {
+    "createdAt": 1557831718135,
     "text": "Asperiores nam tempora qui et provident temporibus illo et fugit.",
     "title": "Title test",
     "userId": "user-id-1",

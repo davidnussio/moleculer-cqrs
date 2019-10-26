@@ -1,0 +1,32 @@
+const { schemas, validate } = require("./validate");
+const {
+  {{camelCaseName}}CreatedEvent,
+  {{camelCaseName}}DeletedEvent,
+  {{camelCaseName}}GenericEvent
+} = require("./events");
+
+function create{{camelCaseName}}(state, command) {
+  validate(state, schemas.create{{camelCaseName}}.state);
+  validate(command, schemas.create{{camelCaseName}}.command);
+
+  return {{camelCaseName}}CreatedEvent({ ...command.payload, createdAt: Date.now() });
+}
+
+function delete{{camelCaseName}}(state, command) {
+  validate(state, schemas.delete{{camelCaseName}}.state);
+
+  return {{camelCaseName}}DeletedEvent({ ...command.payload, deletedAt: Date.now() });
+}
+
+function genericCommand{{camelCaseName}}(state, command) {
+  validate(state, schemas.delete{{camelCaseName}}.state);
+
+  return {{camelCaseName}}GenericEvent(command.payload);
+}
+
+
+module.exports = {
+  create{{camelCaseName}},
+  delete{{camelCaseName}},
+  genericCommand{{camelCaseName}},
+};

@@ -9,3 +9,177 @@
 # moleculer-cqrs [![NPM version](https://img.shields.io/npm/v/moleculer-cqrs.svg)](https://www.npmjs.com/package/moleculer-cqrs)
 
 CQRS and Event sourcing module for moleculerjs
+
+## Getting started
+
+### Create node project
+
+```bash
+$ npx moleculer init project my-first-project
+```
+
+### Install dependencies
+
+```bash
+$ npm install --save moleculer-db moleculer-cqrs
+```
+
+### Create domain code (aggregate)
+
+```
+$ mkdir aggregates
+$ node node_modules/moleculer-cqrs/bin/mol-cqrs-gen.js
+    local@notebook~$ cqrs generate
+    Aggregate directory: ./aggregates
+    Aggregate name: todo
+    ? Do you want generate a view model service?  Yes
+    Services directory: ./services
+    View model name: todo-list
+
+```
+
+Add aggregate path to jest roots
+
+```diff
+diff --git a/package.json b/package.json
+index 3b31276..c82b69d 100644
+--- a/package.json
++++ b/package.json
+@@ -37,7 +37,8 @@
+     "testEnvironment": "node",
+     "rootDir": "./services",
+     "roots": [
+-      "../test"
++      "../test",
++      "../aggregates"
+     ]
+   }
+ }
+```
+
+### Run test
+
+```
+$ npm run ci
+```
+
+### Install Event Sourcing storage adapter
+
+```bash
+$ mkdir event-sourcing-storage
+$ mkdir data
+$ touch event-sourcing-storage/index.js
+$ npm install --save resolve-storage-lite
+
+```
+
+```javascript
+// event-sourcing-storage/index.js
+
+const createEsStorage = require("resolve-storage-lite").default;
+
+const eventStore = createEsStorage({
+  databaseFile: "./data/event-store.sqlite",
+});
+
+module.exports = eventStore;
+```
+
+### Staring up and playing with moleculer services
+
+```bash
+$ npm run dev
+
+# Moleculer repl
+mol $
+
+# Dispatch commands
+call todo.command '{"aggregateId":"uuid-todo-1", "type":"createTodo", "payload":{"title": "Buy Milk"}}'
+call todo.command '{"aggregateId":"uuid-todo-2", "type":"createTodo", "payload":{"title": "Buy Eggs"}}'
+call todo.command '{"aggregateId":"uuid-todo-3", "type":"createTodo", "payload":{"title": "Buy a new Google Pixel 4 XL"}}'
+
+# Query view-model todo-list (MoleculerDb service)
+call todo-list.list
+
+# Query read-model materialized aggregate on-the-fly from event-sourcing
+call todo.read-model '{"aggregateId":"uuid-todo-2"}'
+
+# Dispatch command
+call todo.command '{"aggregateId":"uuid-todo-2", "type":"deleteTodo", "payload":{"message": "Alredy bought"}}'
+
+# Query read-model (state after deleted command)
+call todo.read-model '{"aggregateId":"uuid-todo-2"}'
+
+# Query view-model (after delete event dipatched by deleted command)
+call todo-list.list
+
+# Call MoleculerDb remove, delete data
+call todo-list.remove '{"id":"uuid-todo-1"}'
+call todo-list.remove '{"id":"uuid-todo-3"}'
+
+# Query view-model after manually deleted data
+call todo-list.list
+
+# Regenerate view-model from saved events
+call todo.replay '{"viewModels":["todo-list"]}'
+
+# Query view-model after regeneration from events
+call todo-list.list
+
+# Query aggregate event history (with or without payload)
+call todo.history '{"aggregateId":"uuid-todo-2"}'
+call todo.history '{"aggregateId":"uuid-todo-2", "payload": true}'
+
+# Query read-model (using history events timestamp + 1 millis)
+# Note: add 1 millis to history timestamp because finishTime in not included
+call todo.read-model '{"aggregateId":"uuid-todo-2", "finishTime":1572097057195}'
+
+```
+
+## Aggregate service source code
+
+CQRSEventSourcing service expose four actions but _command_, _read-model_ and _history_ are avaiable only if the mixin recieved and aggregate as parameter.
+
+### Actions:
+
+- command
+  - command action needs aggregateId, type and payload parameters
+- read-model
+  - read-model action needs aggregateId parameter and accept finishTime (timestamp) parameter to load only events untill the specificated datetime
+- history
+  - history action needs aggregateId parameter and accept payload (boolean) parameter to load payload data as well
+- replay
+  - replay action needs viewModels (array of view-model name) parameter
+
+### EventSourcingStorage
+
+- `$ npm install --save resolve-storage-lite` - Adapter info: [SQLite](https://github.com/reimagined/resolve/tree/master/packages/adapters/storage-adapters/resolve-storage-lite)
+- `$ npm install --save resolve-storage-mongo` - Adapter info: [Mongo DB](https://github.com/reimagined/resolve/tree/master/packages/adapters/storage-adapters/resolve-storage-mongo)
+- `$ npm install --save resolve-storage-mysql` - Adapter info: [MySQL](https://github.com/reimagined/resolve/tree/master/packages/adapters/storage-adapters/resolve-storage-mysql)
+- `$ npm install --save resolve-storage-postgresql-serverless` - Adapter info: [Postgresql serverless](https://github.com/reimagined/resolve/tree/master/packages/adapters/storage-adapters/resolve-storage-postgresql-serverless)
+
+```javascript
+const CQRSEventSourcing = require("moleculer-cqrs");
+const EventSourcingStorage = require("../event-sourcing-storage");
+const aggregate = require("../aggregates/todo");
+
+module.exports = {
+  name: "todo",
+  mixins: [CQRSEventSourcing({ aggregate })],
+  storage: EventSourcingStorage,
+  settings: {},
+  dependencies: [],
+  actions: {},
+  events: {},
+  methods: {},
+  created() {},
+  started() {},
+  stopped() {},
+};
+```
+
+## Generate aggregate source code
+
+Getting started with aggregate and service skeleton generated by command line.
+
+`$ node node_modules/moleculer-cqrs/bin/mol-cqrs-gen.js`

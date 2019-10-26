@@ -1,10 +1,18 @@
 {
   "name": "moleculer-cqrs",
   "version": "0.1.0-beta.1",
-  "description": "My Moleculer microservices project",
+  "description": "CQRS, Event Sourcing for Moleculer",
   "author": {
     "name": "David Nussio",
     "email": "david.nussio@gmail.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/davidnussio/moleculer-cqrs.git"
+  },
+  "main": "./index.js",
+  "bin": {
+    "mol-cqrs-gen": "./bin/mol-cqrs-gen.js"
   },
   "scripts": {
     "ci": "jest --watch",
@@ -30,6 +38,7 @@
   "devDependencies": {
     "@types/jest": "^24.0.18",
     "coveralls": "^3.0.7",
+    "date-fns": "^2.6.0",
     "eslint": "^6.1.0",
     "eslint-config-airbnb": "^18.0.1",
     "eslint-config-prettier": "^6.3.0",
@@ -46,9 +55,11 @@
     "prettier": "^1.18.2"
   },
   "dependencies": {
+    "@moleculer/vorpal": "^1.11.5",
     "consolidate": "^0.15.1",
     "fastest-validator": "^0.6.18",
     "glob": "^7.1.4",
+    "inquirer": "^7.0.0",
     "resolve-command": "^0.20.28",
     "resolve-es": "^0.20.28",
     "resolve-storage-lite": "^0.20.28",
