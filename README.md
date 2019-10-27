@@ -12,10 +12,12 @@ CQRS and Event sourcing module for moleculerjs
 
 ## Getting started
 
+If you want skip next steps and start playing with moleculer & moleculer-cqrs clone [moleculer-cqrs-skeleton](https://github.com/davidnussio/moleculer-cqrs-skeleton) repository
+
 ### Create node project
 
 ```bash
-$ npx moleculer init project my-first-project
+$ npx moleculer init project moleculer-cqrs-skeleton
 ```
 
 ### Install dependencies
