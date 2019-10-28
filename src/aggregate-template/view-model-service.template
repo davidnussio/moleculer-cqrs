@@ -8,6 +8,10 @@ module.exports = {
 
   adapter: new DbService.MemoryAdapter(),
 
+  metadata: {
+    viewModel: true
+  },
+
   /**
    *
    * Service settings
