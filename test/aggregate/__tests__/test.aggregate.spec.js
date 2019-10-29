@@ -50,14 +50,14 @@ describe("Testing news aggregate with cqrs fixture", () => {
         type: "createTest",
         payload,
       })
-      .expectEvents(TestCreatedEvent({ ...payload, createdAt: Date.now() }));
+      .expectEvent(TestCreatedEvent({ ...payload, createdAt: Date.now() }));
   });
 
   test("should command function", () => {
     fixture
       .givenEvents()
       .when(createTest, payload)
-      .expectEvents(TestCreatedEvent({ ...payload, createdAt: Date.now() }));
+      .expectEvent(TestCreatedEvent({ ...payload, createdAt: Date.now() }));
   });
 
   test("should reject all next commands when aggregate is already deleted", () => {

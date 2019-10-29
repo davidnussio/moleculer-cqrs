@@ -2,6 +2,7 @@ class CQRSFixture {
   constructor(aggregate) {
     this.aggregate = aggregate;
     this.state = undefined;
+    this.dipatchedEvent = undefined;
   }
 
   givenEvents(events = []) {
@@ -35,7 +36,9 @@ class CQRSFixture {
     }
 
     if (typeof commandFn === "function") {
-      this.event = commandFn(this.state, { payload });
+      const event = commandFn(this.state, { payload });
+      this.state = this.aggregate.projection[event.type](this.state, event);
+      this.dipatchedEvent = event;
     } else {
       throw new Error("Aggregate command not found");
     }
@@ -49,8 +52,14 @@ class CQRSFixture {
     );
   }
 
-  expectEvents(event) {
-    expect(this.event).toEqual(event);
+  expectEvent(event) {
+    expect(this.dipatchedEvent).toEqual(event);
+    return this;
+  }
+
+  inspectState(cb) {
+    cb(this.state);
+    return this;
   }
 }
 

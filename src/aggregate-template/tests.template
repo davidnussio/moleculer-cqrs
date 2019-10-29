@@ -50,14 +50,14 @@ describe("Testing {{aggregateId}} aggregate with cqrs fixture", () => {
         type: "create{{camelCaseName}}",
         payload
       })
-      .expectEvents({{camelCaseName}}CreatedEvent({...payload, createdAt: Date.now() }));
+      .expectEvent({{camelCaseName}}CreatedEvent({...payload, createdAt: Date.now() }));
   });
 
   test("should create{{camelCaseName}} return an {{camelCaseName}}CreatedEvent event", () => {
     fixture
       .givenEvents()
       .when(create{{camelCaseName}}, payload)
-      .expectEvents({{camelCaseName}}CreatedEvent({ ...payload, createdAt: Date.now() }));
+      .expectEvent({{camelCaseName}}CreatedEvent({ ...payload, createdAt: Date.now() }));
   });
 
   test("should reject all next commands when aggregate is already deleted", () => {
