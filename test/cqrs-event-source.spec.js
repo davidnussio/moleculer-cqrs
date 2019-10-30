@@ -298,7 +298,7 @@ describe("CQRS event source", () => {
         })
         .catch(err => {
           expect(err).toBeInstanceOf(MoleculerClientError);
-          expect(err.message).toContain("command action is disabled");
+          expect(err.message).toContain("Command action is disabled");
         });
     });
 

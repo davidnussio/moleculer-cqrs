@@ -1,6 +1,6 @@
 const Validator = require("fastest-validator");
 
-class TestsValidationError extends Error {
+class CommandValidationError extends Error {
   constructor(message, cause) {
     super(message);
     this.name = "ValidationError";
@@ -19,7 +19,7 @@ function validate(object, schema) {
 
   const messages = result.map(({ message }) => message).join("\n 🔥 ");
 
-  throw new TestsValidationError(
+  throw new CommandValidationError(
     `Aggregate validation error 😭\n🔥  ${messages}`,
     result
   );

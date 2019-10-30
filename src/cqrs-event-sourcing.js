@@ -15,7 +15,7 @@ const aggregateSchema = {
     props: { Init: "function" },
   },
   commands: { type: "object" },
-  events: { type: "object", props: { types: { type: "object" } } },
+  events: { type: "object" },
   // invariantHash: string?,
   // serializeState: function
   // deserializeState: function
@@ -61,22 +61,26 @@ module.exports = function CQRSEventSourcing({
           payload: "object",
         },
         async handler(ctx) {
-          const { aggregateId, type } = ctx.params;
+          const { aggregateId, type, payload } = ctx.params;
           try {
-            if (!this.aggregate) {
+            if (this.aggregate === undefined) {
               throw new MoleculerClientError(
-                `Aggregate '${this.aggregateName}' is not configurated, command action is disabled!`
+                `Command action is disabled '${this.name}', no aggregate configured!`
               );
             }
             this.logger.debug(
               `AggregateName: ${this.aggregateName} → ${aggregateId} → ${ctx.params.type}`
             );
+
             await this.commandHandler({
-              ...ctx.params,
+              aggregateId,
               aggregateName: this.aggregateName,
+              type,
+              payload,
             });
           } catch (e) {
             this.logger.error(e.message, ctx.params);
+            this.logger.error(e);
             throw new MoleculerClientError(
               `Aggregate command (id:${aggregateId}) '${this.aggregateName}.${type}' failed: ${e.message}`
             );
@@ -329,8 +333,8 @@ module.exports = function CQRSEventSourcing({
         this.metadata.projection = Object.keys(this.aggregate.projection).map(
           name => name
         );
-        this.metadata.events = Object.keys(this.aggregate.events.types).map(
-          name => this.aggregate.events.types[name]
+        this.metadata.events = Object.keys(this.aggregate.events).map(
+          name => this.aggregate.events[name]
         );
       }
     },

@@ -12,7 +12,7 @@
   },
   "main": "./index.js",
   "bin": {
-    "mol-cqrs-gen": "./bin/mol-cqrs-gen.js"
+    "cqrs-generator": "./bin/cqrs-generator.js"
   },
   "scripts": {
     "ci": "jest --watch",
@@ -21,7 +21,9 @@
     "lint": "eslint --ext=.js src test",
     "lint:fix": "eslint --fix --ext=.js src test",
     "format": "prettier src/**/*.js test/**/*.js",
-    "coverall": "cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js"
+    "coverall": "cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
+    "test:ts": "tsd",
+    "plop": "plop --plopfile src/plop-generator.js"
   },
   "keywords": [
     "microservices",
@@ -52,7 +54,8 @@
     "moleculer-db": "^0.8.2",
     "npm-check": "^5.9.0",
     "post-merge-install": "^0.3.0",
-    "prettier": "^1.18.2"
+    "prettier": "^1.18.2",
+    "tsd": "^0.10.0"
   },
   "dependencies": {
     "@moleculer/vorpal": "^1.11.5",
@@ -60,6 +63,8 @@
     "fastest-validator": "^0.6.18",
     "glob": "^7.1.4",
     "inquirer": "^7.0.0",
+    "node-plop": "^0.23.0",
+    "plop": "^2.5.3",
     "resolve-command": "^0.20.28",
     "resolve-es": "^0.20.28",
     "resolve-storage-lite": "^0.20.28",
@@ -79,6 +84,10 @@
       "/node_modules/",
       "/test/aggregate/"
     ]
+  },
+  "types": "./index.d.ts",
+  "tsd": {
+    "directory": "test/typescript/tsd"
   },
   "prettier": {
     "trailingComma": "es5",

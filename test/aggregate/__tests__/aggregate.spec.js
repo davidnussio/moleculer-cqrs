@@ -1,28 +1,28 @@
-const CQRSFixture = require("../../../src/cqrs-fixture");
+const { CQRSFixture } = require("../../..");
 
 const aggregate = require("..");
 
 const {
-  commands: { createTest, deleteTest, genericCommandTest },
+  commands: { createTest, deleteTest },
   events: { TestCreatedEvent, TestDeletedEvent },
 } = aggregate;
 
+jest
+  .spyOn(global.Date, "now")
+  .mockImplementation(() => new Date("2019-10-01T11:01:58.135Z").valueOf());
+
 const payload = {
-  title: "Title test",
+  title: "Test document title",
   userId: "user-id-1",
   text: "Asperiores nam tempora qui et provident temporibus illo et fugit.",
 };
-
-jest
-  .spyOn(global.Date, "now")
-  .mockImplementation(() => new Date("2019-05-14T11:01:58.135Z").valueOf());
 
 describe("Testing aggregate commands in isolation", () => {
   test("should commands with empty payload throw error", () => {
     expect(() => createTest({}, {})).toThrow("Aggregate validation error");
   });
 
-  test("should createTest command return an TestCreatedEvent", () => {
+  test("should createTest command return an TestsCreatedEvent", () => {
     expect(
       createTest(
         {},
@@ -34,7 +34,7 @@ describe("Testing aggregate commands in isolation", () => {
   });
 });
 
-describe("Testing news aggregate with cqrs fixture", () => {
+describe("Testing aggregate with cqrs fixture", () => {
   let fixture;
 
   beforeEach(() => {
@@ -45,18 +45,17 @@ describe("Testing news aggregate with cqrs fixture", () => {
     fixture
       .givenEvents([])
       .when({
-        aggregateId: "12345",
-        aggregateName: "test",
+        aggregateId: "aggregate-uuid-1",
         type: "createTest",
         payload,
       })
       .expectEvent(TestCreatedEvent({ ...payload, createdAt: Date.now() }));
   });
 
-  test("should command function", () => {
+  test("should createTest return an TestCreatedEvent event", () => {
     fixture
       .givenEvents()
-      .when(createTest, payload)
+      .when(createTest, { aggregateId: "aggregate-uuid-1", payload })
       .expectEvent(TestCreatedEvent({ ...payload, createdAt: Date.now() }));
   });
 
@@ -69,10 +68,16 @@ describe("Testing news aggregate with cqrs fixture", () => {
       .givenEvents(initialEventStream)
       .whenThrow(deleteTest, {})
       .toThrow("Aggregate is already deleted");
+  });
 
+  test("should created order accepts delete command", () => {
+    const aggregateId = "aggregate-uuid-1";
+    const initialEventStream = [
+      TestCreatedEvent({ payload, createdAt: Date.now() }),
+    ];
     fixture
-      .givenEvents(initialEventStream)
-      .whenThrow(genericCommandTest, {})
-      .toThrow("Aggregate is already deleted");
+      .givenEvents(initialEventStream, aggregateId)
+      .when(deleteTest, { aggregateId, payload: {} })
+      .expectEvent(TestDeletedEvent({ deletedAt: Date.now() }));
   });
 });

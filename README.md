@@ -20,6 +20,12 @@ If you want skip next steps and start playing with moleculer & moleculer-cqrs cl
 $ npx moleculer init project moleculer-cqrs-skeleton
 ```
 
+### Initialize git repository
+
+```bash
+$ git init
+```
+
 ### Install dependencies
 
 ```bash
@@ -29,8 +35,7 @@ $ npm install --save moleculer-db moleculer-cqrs
 ### Create domain code (aggregate)
 
 ```
-$ mkdir aggregates
-$ node node_modules/moleculer-cqrs/bin/mol-cqrs-gen.js
+$ node node_modules/moleculer-cqrs/bin/cqrs-generator.js
     local@notebook~$ cqrs generate
     Aggregate directory: ./aggregates
     Aggregate name: todo

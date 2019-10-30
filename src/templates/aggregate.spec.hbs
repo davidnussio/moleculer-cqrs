@@ -1,0 +1,83 @@
+const { CQRSFixture } = require("moleculer-cqrs");
+
+const aggregate = require("..");
+
+const {
+  commands: { create{{properCase name}}, delete{{properCase name}} },
+  events: { {{properCase name}}CreatedEvent, {{properCase name}}DeletedEvent },
+} = aggregate;
+
+jest
+  .spyOn(global.Date, "now")
+  .mockImplementation(() => new Date("2019-10-01T11:01:58.135Z").valueOf());
+
+const payload = {
+  title: "Test document title",
+  userId: "user-id-1",
+  text: "Asperiores nam tempora qui et provident temporibus illo et fugit.",
+};
+
+describe("Testing aggregate commands in isolation", () => {
+  test("should commands with empty payload throw error", () => {
+    expect(() => create{{properCase name}}({}, {})).toThrow("Aggregate validation error");
+  });
+
+  test("should create{{properCase name}} command return an TestsCreatedEvent", () => {
+    expect(
+      create{{properCase name}}(
+        {},
+        {
+          payload,
+        }
+      )
+    ).toMatchSnapshot();
+  });
+});
+
+describe("Testing aggregate with cqrs fixture", () => {
+  let fixture;
+
+  beforeEach(() => {
+    fixture = new CQRSFixture(aggregate);
+  });
+
+  test("should call raw command", () => {
+    fixture
+      .givenEvents([])
+      .when({
+        aggregateId: "aggregate-uuid-1",
+        type: "create{{properCase name}}",
+        payload,
+      })
+      .expectEvent({{properCase name}}CreatedEvent({ ...payload, createdAt: Date.now() }));
+  });
+
+  test("should create{{properCase name}} return an {{properCase name}}CreatedEvent event", () => {
+    fixture
+      .givenEvents()
+      .when(create{{properCase name}}, { aggregateId: "aggregate-uuid-1", payload })
+      .expectEvent({{properCase name}}CreatedEvent({ ...payload, createdAt: Date.now() }));
+  });
+
+  test("should reject all next commands when aggregate is already deleted", () => {
+    const initialEventStream = [
+      {{properCase name}}CreatedEvent({ payload, createdAt: Date.now() }),
+      {{properCase name}}DeletedEvent({ deletedAt: Date.now() }),
+    ];
+    fixture
+      .givenEvents(initialEventStream)
+      .whenThrow(delete{{properCase name}}, {})
+      .toThrow("Aggregate is already deleted");
+  });
+
+  test("should created order accepts delete command", () => {
+    const aggregateId = "aggregate-uuid-1";
+    const initialEventStream = [
+      {{properCase name}}CreatedEvent({ payload, createdAt: Date.now() }),
+    ];
+    fixture
+      .givenEvents(initialEventStream, aggregateId)
+      .when(delete{{properCase name}}, { aggregateId, payload: {} })
+      .expectEvent({{properCase name}}DeletedEvent({ deletedAt: Date.now() }));
+  });
+});

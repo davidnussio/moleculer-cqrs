@@ -1,5 +1,5 @@
 const DbService = require("moleculer-db");
-const { events: event{{camelCaseName}} } = require("../{{newAggregatePath}}");
+const { events: event{{camelCaseName}} } = require("../{{aggregateDir}}/{{dashCase name}}");
 
 module.exports = {
   name: "{{viewModelName}}",
@@ -36,13 +36,13 @@ module.exports = {
    * Events
    */
   events: {
-    [event{{camelCaseName}}.types.CREATED](event) {
+    [event{{camelCaseName}}.CREATED](event) {
       this.actions.create({
         _id: event.aggregateId,
         title: event.payload.title,
       });
     },
-    [event{{camelCaseName}}.types.DELETED](event) {
+    [event{{camelCaseName}}.DELETED](event) {
       this.actions.remove({ id: event.aggregateId });
     },
   },

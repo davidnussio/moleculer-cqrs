@@ -1,11 +1,15 @@
+const events = require("./events");
 const projection = require("./projection");
 const commands = require("./commands");
-const events = require("./events");
+
+/**
+ * test aggregate
+ */
 
 module.exports = {
   name: "test",
-  projection,
   commands,
+  projection,
   events,
   invariantHash: null,
   serializeState: state => JSON.stringify(state),

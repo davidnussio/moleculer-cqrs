@@ -1,17 +1,17 @@
+const events = require("./events");
 const projection = require("./projection");
 const commands = require("./commands");
-const events = require("./events");
 
 /**
- * {{aggregateName}} aggregate
+ * {{name}} aggregate
  */
 
 module.exports = {
-  name: "{{aggregateName}}",
-  projection,
+  name: "{{name}}",
   commands,
-  events,
+  projection,
+  events: events.types,
   invariantHash: null,
   serializeState: state => JSON.stringify(state),
   deserializeState: serializedState => JSON.parse(serializedState),
-}
+};

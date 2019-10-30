@@ -1,9 +1,5 @@
 const {
-  types: {
-    CREATED,
-    DELETED,
-    GENERIC
-  },
+  types: { CREATED, DELETED, GENERIC_EVENT },
 } = require("./events");
 
 module.exports = {
@@ -18,7 +14,7 @@ module.exports = {
     ...payload,
   }),
 
-  [GENERIC]: (state, { payload }) => ({
+  [GENERIC_EVENT]: (state, { payload }) => ({
     ...state,
     ...payload,
   }),

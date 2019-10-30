@@ -1,5 +1,5 @@
-const CREATED = "aggregate.test.created";
-const DELETED = "aggregate.test.deleted";
+const CREATED = "aggregate.order.created";
+const DELETED = "aggregate.order.deleted";
 const GENERIC_EVENT = "aggregate.test.generic_event";
 
 function TestCreatedEvent(payload) {
@@ -24,11 +24,7 @@ function TestGenericEvent(payload) {
 }
 
 module.exports = {
-  types: {
-    CREATED,
-    DELETED,
-    GENERIC_EVENT,
-  },
+  types: { CREATED, DELETED, GENERIC_EVENT },
   TestCreatedEvent,
   TestDeletedEvent,
   TestGenericEvent,
