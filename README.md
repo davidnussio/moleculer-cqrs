@@ -17,32 +17,31 @@ If you want skip next steps and start playing with moleculer & moleculer-cqrs cl
 ### Create node project
 
 ```bash
-$ npx moleculer init project moleculer-cqrs-skeleton
+npx moleculer init project moleculer-cqrs-skeleton
 ```
 
 ### Initialize git repository
 
 ```bash
-$ git init
+git init
 ```
 
 ### Install dependencies
 
 ```bash
-$ npm install --save moleculer-db moleculer-cqrs
+npm install --save moleculer-db moleculer-cqrs
 ```
 
 ### Create domain code (aggregate)
 
-```
-$ node node_modules/moleculer-cqrs/bin/cqrs-generator.js
-    local@notebook~$ cqrs generate
-    Aggregate directory: ./aggregates
-    Aggregate name: todo
-    ? Do you want generate a view model service?  Yes
-    Services directory: ./services
-    View model name: todo-list
-
+```bash
+node node_modules/moleculer-cqrs/bin/cqrs-generator.js
+  local@notebook~$ cqrs generate
+  Aggregate directory: ./aggregates
+  Aggregate name: todo
+  ? Do you want generate a view model service?  Yes
+  Services directory: ./services
+  View model name: todo-list
 ```
 
 Add aggregate path to jest roots
@@ -66,18 +65,17 @@ index 3b31276..c82b69d 100644
 
 ### Run test
 
-```
-$ npm run ci
+```bash
+npm run ci
 ```
 
 ### Install Event Sourcing storage adapter
 
 ```bash
-$ mkdir event-sourcing-storage
-$ mkdir data
-$ touch event-sourcing-storage/index.js
-$ npm install --save resolve-storage-lite
-
+mkdir event-sourcing-storage
+mkdir data
+touch event-sourcing-storage/index.js
+npm install --save resolve-storage-lite
 ```
 
 ```javascript
@@ -95,7 +93,7 @@ module.exports = eventStore;
 ### Staring up and playing with moleculer services
 
 ```bash
-$ npm run dev
+npm run dev
 
 # Moleculer repl
 mol $
@@ -140,7 +138,6 @@ call todo.history '{"aggregateId":"uuid-todo-2", "payload": true}'
 # Query read-model (using history events timestamp + 1 millis)
 # Note: add 1 millis to history timestamp because finishTime in not included
 call todo.read-model '{"aggregateId":"uuid-todo-2", "finishTime":1572097057195}'
-
 ```
 
 ## Aggregate service source code
