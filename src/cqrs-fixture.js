@@ -1,4 +1,5 @@
 /* eslint-disable no-param-reassign */
+
 class CQRSFixture {
   constructor(aggregate) {
     this.aggregate = aggregate;
@@ -43,6 +44,8 @@ class CQRSFixture {
     } else if (typeof command === "string") {
       commandFn = this.aggregate.commands[command];
       type = command;
+      command = { aggregateId: payload.aggregateId };
+      payload = payload.payload;
     } else if (typeof command === "function") {
       commandFn = command;
       command.aggregateId = payload.aggregateId;
@@ -52,10 +55,9 @@ class CQRSFixture {
 
     if (typeof commandFn === "function") {
       if (!command.aggregateId) {
-        throw new Error("CQRSFixture: Command → aggregateId is missing");
-      }
-      if (!type) {
-        throw new Error("CQRSFixture: Command → type is missing");
+        throw new Error(
+          "Validation command error, command does not have an aggregateId"
+        );
       }
       const event = {
         aggregateId: command.aggregateId,
@@ -67,7 +69,7 @@ class CQRSFixture {
       this.state = this.aggregate.projection[event.type](this.state, event);
       this.dipatchedEvent = event;
     } else {
-      throw new Error("CQRSFixture: Aggregate command not found");
+      throw new Error("Command dispatch error, aggregate command not found");
     }
 
     return this;
@@ -80,13 +82,17 @@ class CQRSFixture {
   }
 
   expectEvent(event) {
-    const { aggregateId, aggregateVersion, timestamp } = this.dipatchedEvent;
-    expect(this.dipatchedEvent).toEqual({
-      aggregateId,
-      aggregateVersion,
-      timestamp,
-      ...event,
-    });
+    if (typeof event === "function") {
+      expect(event().type).toEqual(this.dipatchedEvent.type);
+    } else {
+      const { aggregateId, aggregateVersion, timestamp } = this.dipatchedEvent;
+      expect(this.dipatchedEvent).toEqual({
+        aggregateId,
+        aggregateVersion,
+        timestamp,
+        ...event,
+      });
+    }
     return this;
   }
 
