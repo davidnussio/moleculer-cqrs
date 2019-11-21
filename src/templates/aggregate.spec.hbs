@@ -1,10 +1,10 @@
 const { CQRSFixture } = require("moleculer-cqrs");
 
 const aggregate = require("..");
+const { {{properCase name}}CreatedEvent, {{properCase name}}DeletedEvent } = require("../events");
 
 const {
   commands: { create{{properCase name}}, delete{{properCase name}} },
-  events: { {{properCase name}}CreatedEvent, {{properCase name}}DeletedEvent },
 } = aggregate;
 
 jest
